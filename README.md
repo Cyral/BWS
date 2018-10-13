@@ -1,6 +1,6 @@
 # BWS (Binary WebSockets)
 
-This library provides a TypeScript client and ASP.Net Core server for binary WebSocket communication. Messages are read and written using helper methods to read individual values. 
+This library provides a TypeScript client and ASP.NET Core server for binary WebSocket communication. Messages are read and written using helper methods to read individual values. 
 
 This library does not make many assumptions on how your data will be serialized so it is very barebones by design. You will need to create a system for serializing/deserializing messages, differentiating between message types, and keeping track of connected clients.
 
@@ -24,8 +24,6 @@ export class App {
   public websockets: BinaryWebSocketService;
 
   constructor(container: HTMLElement) {
-    super(container);
-
     this.websockets = new BinaryWebSocketService({
       connectionURL: "wss://live.example.localhost/ws"
     });
