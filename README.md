@@ -9,7 +9,9 @@ BWS uses BinaryWriter and BinaryReader internally on the server side, and a comp
 ## Installation:
 
 - **Client**: [`npm install binary-websockets`](https://www.npmjs.com/package/binary-websockets)
-- **Server**: Build and import .dll from project
+- **Server**: [`dotnet add package BinaryWebSockets --version 1.0.0-alpha](https://www.nuget.org/packages/BinaryWebSockets/) 
+
+<sup>Note: This package depends on a preview release of Microsoft.AspNetCore.WebSockets which may cause dependency issues. It will be better suited for use when the required functions are in a stable release of .NET Core 2.2.</sup>
 
 ## Example:
 Below a minimal example that uses this library. It uses classes to define different types of messages, where the first byte of each message determines the type.
