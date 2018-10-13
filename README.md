@@ -9,7 +9,7 @@ BWS uses BinaryWriter and BinaryReader internally on the server side, and a comp
 ## Installation:
 
 - **Client**: [`npm install binary-websockets`](https://www.npmjs.com/package/binary-websockets)
-- **Server**: [`dotnet add package BinaryWebSockets --version 1.0.0-alpha](https://www.nuget.org/packages/BinaryWebSockets/) 
+- **Server**: [`dotnet add package BinaryWebSockets --version 1.0.0-alpha`](https://www.nuget.org/packages/BinaryWebSockets/) 
 
 <sup>Note: This package depends on a preview release of Microsoft.AspNetCore.WebSockets which may cause dependency issues. It will be better suited for use when the required functions are in a stable release of .NET Core 2.2.</sup>
 
