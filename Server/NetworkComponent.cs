@@ -8,36 +8,21 @@ using System.Threading.Tasks;
 
 namespace BinaryWebSockets {
     public class NetworkComponent {
-        public delegate void MessageReceivedEvent(Connection connection, IncomingMessage message);
-
         public delegate void ClientConnectedEvent(Connection connection);
 
         public delegate void ClientDisconnectedEvent(Connection connection);
 
-        /// <summary>
-        /// Event when a message is received from a client.
-        /// </summary>
-        public event MessageReceivedEvent MessageReceived;
-        
-        /// <summary>
-        /// Event when a client is connected.
-        /// </summary>
-        public event ClientConnectedEvent ClientConnected;
-        
-        /// <summary>
-        /// Event when a client is disconnected.
-        /// </summary>
-        public event ClientDisconnectedEvent ClientDisconnected;
+        public delegate void MessageReceivedEvent(Connection connection, IncomingMessage message);
 
         /// <summary>
-        /// Triggered when an event to be ran on the network thread is received.
-        /// </summary>
-        private readonly AutoResetEvent eventTrigger;
-
-        /// <summary>
-        /// Events to be ran on the network thread.
+        ///     Events to be ran on the network thread.
         /// </summary>
         private readonly ConcurrentQueue<NetQueueItem> eventQueue;
+
+        /// <summary>
+        ///     Triggered when an event to be ran on the network thread is received.
+        /// </summary>
+        private readonly AutoResetEvent eventTrigger;
 
         public NetworkComponent() {
             eventQueue = new ConcurrentQueue<NetQueueItem>();
@@ -48,21 +33,36 @@ namespace BinaryWebSockets {
         }
 
         /// <summary>
-        /// Creates a new outgoing message.
+        ///     Event when a message is received from a client.
+        /// </summary>
+        public event MessageReceivedEvent MessageReceived;
+
+        /// <summary>
+        ///     Event when a client is connected.
+        /// </summary>
+        public event ClientConnectedEvent ClientConnected;
+
+        /// <summary>
+        ///     Event when a client is disconnected.
+        /// </summary>
+        public event ClientDisconnectedEvent ClientDisconnected;
+
+        /// <summary>
+        ///     Creates a new outgoing message.
         /// </summary>
         public OutgoingMessage CreateMessage() {
             return new OutgoingMessage();
         }
 
         /// <summary>
-        /// Disposes an incoming message.
+        ///     Disposes an incoming message.
         /// </summary>
         public void Recycle(IncomingMessage inc) {
             inc.Dispose();
         }
 
         /// <summary>
-        /// Sends a message to the specified connection.
+        ///     Sends a message to the specified connection.
         /// </summary>
         public async Task Send(OutgoingMessage message, Connection connection) {
             if (connection.CancellationToken.IsCancellationRequested) return;
@@ -71,7 +71,7 @@ namespace BinaryWebSockets {
         }
 
         /// <summary>
-        /// Closes a client connection.
+        ///     Closes a client connection.
         /// </summary>
         /// <param name="connection"></param>
         /// <returns></returns>
@@ -90,12 +90,12 @@ namespace BinaryWebSockets {
         }
 
         /// <summary>
-        /// Reads a message from the WebSocket.
+        ///     Reads a message from the WebSocket.
         /// </summary>
         internal async Task Read(ArraySegment<byte> buffer, Connection connection) {
             var ms = new MemoryStream();
             WebSocketReceiveResult result;
-            
+
             // Wait for data, read all of it, and write it to the memory stream.
             do {
                 try {
@@ -106,7 +106,7 @@ namespace BinaryWebSockets {
                     ms.Dispose();
                     return;
                 }
-                
+
                 ms.Write(buffer.Array, buffer.Offset, result.Count);
             } while (!result.EndOfMessage && !connection.CancellationToken.IsCancellationRequested);
 
@@ -118,7 +118,8 @@ namespace BinaryWebSockets {
             }
 
             // If the socket has been closed, we don't need to construct a data message, just return.
-            if (connection.CancellationToken.IsCancellationRequested || result.MessageType == WebSocketMessageType.Close) {
+            if (connection.CancellationToken.IsCancellationRequested ||
+                result.MessageType == WebSocketMessageType.Close) {
                 ms.Dispose();
                 return;
             }
@@ -135,9 +136,9 @@ namespace BinaryWebSockets {
         }
 
         /// <summary>
-        /// Waits for new events from another thread and then processes the event queue when messages
-        /// are available. This serves to run all message events on a single thread instead of the multiple threads
-        /// that ASP.NET uses for handling requests.
+        ///     Waits for new events from another thread and then processes the event queue when messages
+        ///     are available. This serves to run all message events on a single thread instead of the multiple threads
+        ///     that ASP.NET uses for handling requests.
         /// </summary>
         private void ProcessNetworkEvents() {
             while (true) {
@@ -146,7 +147,7 @@ namespace BinaryWebSockets {
 
                 // Dequeue all received messages and execute the appropriate event.
                 while (!eventQueue.IsEmpty) {
-                    if (eventQueue.TryDequeue(out var item)) {
+                    if (eventQueue.TryDequeue(out var item))
                         switch (item.Type) {
                             case IncomingMessageType.Connect:
                                 ClientConnected?.Invoke(item.Connection);
@@ -160,7 +161,6 @@ namespace BinaryWebSockets {
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
-                    }
                 }
             }
         }

@@ -1,51 +1,49 @@
 using System;
 using System.IO;
-using System.Text;
 
 namespace BinaryWebSockets {
     public class IncomingMessage {
-        
-        public Connection Connection { get; private set; }
+        private readonly BinaryReader binaryReader;
 
-        private BinaryReader binaryReader;
-        
         internal IncomingMessage(BinaryReader binaryReader, Connection connection) {
             this.binaryReader = binaryReader;
             Connection = connection;
         }
-        
+
+        public Connection Connection { get; }
+
         public string ReadString() {
             return binaryReader.ReadString();
         }
-        
+
         public int ReadInt32() {
             return binaryReader.ReadInt32();
         }
-        
+
         public short ReadInt16() {
             return binaryReader.ReadInt16();
         }
-        
+
         public sbyte ReadInt8() {
             return binaryReader.ReadSByte();
         }
-        
+
         public uint ReadUInt32() {
             return binaryReader.ReadUInt32();
         }
-        
+
         public ushort ReadUInt16() {
             return binaryReader.ReadUInt16();
         }
-        
+
         public byte ReadUInt8() {
             return binaryReader.ReadByte();
         }
-        
+
         public double ReadDouble() {
             return binaryReader.ReadDouble();
         }
-        
+
         public float ReadFloat() {
             return binaryReader.ReadSingle();
         }

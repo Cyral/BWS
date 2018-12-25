@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BinaryWebSockets {
     public class BinaryWebSocketMiddleware {
-        private readonly RequestDelegate next;
         private readonly NetworkComponent networkComponent;
+        private readonly RequestDelegate next;
         private readonly BWSOptions options;
-        private long nextId = 0;
+        private long nextId;
 
         public BinaryWebSocketMiddleware(BWSOptions options, NetworkComponent networkComponent, RequestDelegate next) {
             this.options = options;
@@ -35,11 +29,11 @@ namespace BinaryWebSockets {
                 context.Response.StatusCode = 400;
                 return;
             }
-            
+
             // Accept the WebSocket connection.
             var socket = await context.WebSockets.AcceptWebSocketAsync("bws");
             var ct = context.RequestAborted;
-            
+
             // Create a unique ID to identify this connection instance.
             var uniqueId = nextId++;
             var connection = new Connection(uniqueId, socket, context.Connection, ct);
@@ -51,10 +45,9 @@ namespace BinaryWebSockets {
             var buffer = new ArraySegment<byte>(new byte[options.ReceiveBufferSize]);
 
             // Read data until the socket is closed.
-            while (socket.State == WebSocketState.Open && !ct.IsCancellationRequested) {
+            while (socket.State == WebSocketState.Open && !ct.IsCancellationRequested)
                 await networkComponent.Read(buffer, connection);
-            }
-            
+
             networkComponent.OnClientDisconnected(connection);
         }
     }
